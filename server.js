@@ -7,7 +7,9 @@ app.use(express.json({limit: '1mb'}))
 
 var Airtable = require('airtable');
 const { response } = require('express')
-var base = new Airtable({apiKey: 'keyo2CUgiemk1YL2T'}).base('app4ikFafeYAEjdls');
+let apiKey = process.env.AIRTABLE_API_KEY
+let baseID = process.env.AIRTABLE_BASE_ID
+var base = new Airtable({apiKey: 'apiKey'}).base('baseID');
 
 app.get('/set', async (req, res) => {
     base('Sets').select({
