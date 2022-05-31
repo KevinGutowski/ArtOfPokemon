@@ -1,0 +1,86 @@
+.top {
+    display: flex;
+}
+
+/* set table styling */
+#sets, #illustrators {
+    display: block;
+    width: 400px;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+#sets td, #illustrators td {
+    white-space: nowrap;
+}
+
+.name {
+    display: flex;
+    flex-direction: column;
+    vertical-align: top;
+    margin-left: 4px;
+}
+
+.jp {
+    font-size: 14px;
+    color: rgb(73, 73, 73);
+}
+
+.setID-image {
+    height: 20px;
+    transform: translateY(5px);
+    width: 34px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+#sets > tr {
+    vertical-align: top;
+    display: flex;
+    align-items: baseline;
+}
+
+/* illustrators table styling */
+
+/* cards table styling */
+
+#cardsByIllustrator {
+    border-collapse: collapse;
+}
+
+#cardsByIllustrator td {
+    vertical-align: top;
+}
+
+.cardContainer {
+	display: flex;
+}
+.imgContainer img {
+	width: 60px;
+	height: auto;
+	position: absolute;
+	left: -4px;
+	transition: .5s ease;
+}
+
+.imgContainer {
+	position: relative;
+	width: 51px;
+	height: 34px;
+	background-color: red;
+	display: inline-block;
+	overflow: hidden;
+	border-radius: 4px;
+	transition: .3s ease;
+}
+
+.imgContainer:hover {
+	transform: translateY(-1px);
+}
+
+.setForIllustrator {
+	display: grid;
+	justify-items: start;
+	grid-template-columns: repeat(3,max-content);
+	gap: 4px;
+}
