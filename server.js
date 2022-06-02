@@ -1,6 +1,8 @@
 const express = require('express')
 const fetch = require('node-fetch')
 const app = express()
+require('dotenv').config()
+
 app.listen(3000, () => console.log('Running on port 3000'))
 app.use(express.static('public'))
 app.use(express.json({limit: '1mb'}))
@@ -9,7 +11,7 @@ var Airtable = require('airtable');
 const { response } = require('express')
 let apiKey = process.env.AIRTABLE_API_KEY
 let baseID = process.env.AIRTABLE_BASE_ID
-var base = new Airtable({apiKey: 'apiKey'}).base('baseID');
+var base = new Airtable({apiKey: apiKey}).base(baseID);
 
 app.get('/set', async (req, res) => {
     base('Sets').select({
