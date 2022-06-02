@@ -1,5 +1,7 @@
 console.log('Client Script');
 
+const defaultSelectedSets = ['s10a','s10D','s10P','s9a'];
+
 getSets();
 getCards();
 
@@ -17,6 +19,7 @@ async function getSets() {
     tr.append('td').append('input')
         .attr('type','checkbox')
         .attr('name', d => d.fields['ID'])
+        .attr('class','checkbox_set')
 
     tr.append('td')
         .append('img')
@@ -39,13 +42,43 @@ async function getSets() {
     nameCell.insert('div')
         .text(d => d.fields['Name (JP)'])
         .attr('class', 'jp')
+
+    
+
+    document.querySelectorAll('.checkbox_set').forEach(el=>{
+        let uniformSelectedSetIds = defaultSelectedSets.map(i=>i.toLowerCase())
+        el.checked = uniformSelectedSetIds.includes(el.name.toLowerCase())
+    })
 }
 
-async function getCards() {
-    const response = await fetch('/cards');
-    const data = await response.json();
+let cardSetsCache = []; // maybe set some limit on number of sets here?
+let setsToRender = [];
 
-    let cardsByIllustrator_set = Array.from(d3.group(data, d=>d.illustrator, d=>d.setId)).sort((a,b)=>{
+async function requestForNewSets() {
+    // get the selected sets
+    let requestedSets = document.querySelectorAll('.checkbox_set:checked').map(el=>el.name.toLowerCase())
+
+    // check if requested sets are in cardSetCache
+    let newSetsToGet = [];
+    requestedSets.forEach(setId=>{
+        var checkIfInSetCache = cardSetsCache.some(set=>i.set.jpn-cards_id.includes(setId))
+        if (!checkIfInSetCache) {
+            newSetsToGet.push(setId)
+        }
+    })
+
+    // if there are new sets to get, request them and add data to the cache
+    if (newSetsToGet.length > 0) {
+        let newCards = getCards(newSetsToGet)
+        cardSetsCache.concat(newCards)
+    }
+    
+    // pluck sets requested from cardSetCache
+    // updateCards
+}
+
+function updateCards(cardData) {
+    let cardsByIllustrator_set = Array.from(d3.group(cardData, d=>d.illustrator, d=>d.setId)).sort((a,b)=>{
 		if (a[0].toLowerCase() < b[0].toLowerCase()) { return -1 }
 		if (a[0].toLowerCase() > b[0].toLowerCase()) { return 1 }
 		return 0
@@ -56,7 +89,7 @@ async function getCards() {
 	})
 
     let sortedIllustrators = cardsByIllustrator_set.map(el=>el[0])
-    let idGroups = d3.group(data, d=>d.setId)
+    let idGroups = d3.group(cardData, d=>d.setId)
     let sortedIdGroups = [...idGroups.entries()].sort()
     let sortedIds = sortedIdGroups.map(el=>el[1][0].setId)   
     let sortedSetNames = sortedIdGroups.map(el=>el[1][0].setName)
@@ -105,7 +138,6 @@ async function getCards() {
     let cardContainer = setForIllustrator
         .selectAll('.cardContainer')
         .data(d=>{
-            console.log(d)
             if (d == undefined) {
                 return ""
             } else {
@@ -126,4 +158,21 @@ async function getCards() {
             } else {
                 return '-11px'
             }})
+}
+
+// TODO: change get cards to take in an array of set ids (lowercased)
+// TODO: don't flatten the array of sets and change updateCards to take in an array of sets
+async function getCards() {
+    const endpoint = `/cards/${defaultSelectedSets.join(',')}`;
+    const response = await fetch(endpoint);
+    // response is an array of objects
+    // each object has a set and an array of cards
+    // {"set":{"jpn-cards_id":"s10a","jpn-cards_name":"10th Anniversary","requested_at":""}, "cards":[{...},{...},{...},...]}
+    // Note: jpn-cards_id is lowercased
+
+    const data = await response.json();
+    const cards = data.map(set => set.cards);
+
+    const flattenedCards = [].concat.apply([], cards)
+    updateCards(flattenedCards)
 }
