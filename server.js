@@ -32,13 +32,13 @@ app.get('/set', async (req, res) => {
 })
 
 app.get('/cards/:sets', async (req, res) => {
-    // :sets expects a comma-separated list of set IDs
-    // e.g. /cards/s10a,s10D,s10P
+    // :sets expects a comma-separated list of lowercased set IDs
+    // e.g. /cards/s10a,s10d,s10p
     const sets_URL = "https://www.jpn-cards.com/set"
     const fetch_response = await fetch(sets_URL)
     const sets_json = await fetch_response.json()
     const selectedSets = req.params.sets.split(',')
-    const sets = sets_json.filter(set => selectedSets.includes(set.shorthand))
+    const sets = sets_json.filter(set => selectedSets.includes(set.shorthand.toLowerCase()))
 
     let cards = []
     for await (const set of sets) {
@@ -48,7 +48,8 @@ app.get('/cards/:sets', async (req, res) => {
         cards.push({
             "set":{
                 "jpn-cards_id":set.id,
-                "jpn-cards_name":set.name.lowercase(),
+                "jpn-cards_name":set.name,
+                "jpn-cards_shorthand":set.shorthand.toLowerCase(),
                 "requested_at":new Date().toISOString()
             }, 
             "cards":cards_json

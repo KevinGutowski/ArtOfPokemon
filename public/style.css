@@ -2,15 +2,22 @@
     display: flex;
 }
 
-/* set table styling */
-#sets, #illustrators {
+#sets {
     display: block;
+}
+
+#sets,#illustrators {
     width: 400px;
     height: 300px;
     overflow-y: scroll;
 }
 
-#sets td, #illustrators td {
+#illustrators {
+    display: flex;
+    flex-direction: column;
+}
+
+#sets td, #illustrators span {
     white-space: nowrap;
 }
 
